@@ -4,6 +4,8 @@ import Controller.Controller;
 import Entities.Car;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -47,6 +49,11 @@ public class CarWindow extends JFrame {
     }
 
 
+    public void closeWindow() {
+        dispose();
+    }
+
+
     private class CarPanel extends JPanel {
         private Controller controller;
         private Car car;
@@ -56,6 +63,7 @@ public class CarWindow extends JFrame {
         private JButton btnStart;
         private JButton btnPause;
         private JButton btnExitRace;
+        private JButton btnCloseWindow;
 
         public CarPanel(Controller controller, Car car) {
             this.controller = controller;
@@ -70,11 +78,12 @@ public class CarWindow extends JFrame {
             setBackground(Color.GRAY);
             setSize(new Dimension(500,250));
             setMinimumSize(new Dimension(500, 250));
-            lblSpeed = new JLabel("Speed:");
+            setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            lblSpeed = new JLabel("Speed: 50km/h");
             slider = new JSlider(0, 100);
             slider.setOrientation(JSlider.HORIZONTAL);
             slider.setMajorTickSpacing(10);
-            slider.setMinorTickSpacing(5);
+            slider.setMinorTickSpacing(1);
             slider.setPaintTicks(true);
             slider.setBackground(Color.LIGHT_GRAY);
             slider.createStandardLabels(10);
@@ -88,6 +97,7 @@ public class CarWindow extends JFrame {
             btnStart = new JButton("Start");
             btnPause = new JButton("Pause");
             btnExitRace = new JButton("Exit Race");
+            btnCloseWindow = new JButton("Exit");
         }
 
         private void initializeGUI() {
@@ -107,26 +117,47 @@ public class CarWindow extends JFrame {
             c.gridx = 2;
             panelSouth.add(btnExitRace, c);
 
+            c.gridx = 3;
+            panelSouth.add(btnCloseWindow, c);
+
             add(panelSouth, BorderLayout.SOUTH);
 
         }
 
+        public Car getCar() {
+            return car;
+        }
+
+
         private void registerListeners() {
             btnStart.addActionListener(new StartListener());
+            btnCloseWindow.addActionListener(new ExitListener());
+            slider.addChangeListener(new SliderListener());
+        }
+
+        private class SliderListener implements ChangeListener {
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                lblSpeed.setText("Speed: " + slider.getValue() + "km/h");
+                car.setSpeed(slider.getValue());
+            }
         }
 
         private class StartListener implements ActionListener {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                System.out.println(car);
-                System.out.println("Speed: " + slider.getValue());
-                //controller.startCar(car, slider.getValue());
-                car.setSpeed(slider.getValue());
-                controller.addCarToQueue(car);
-                dispose();
+                controller.btnPressed("StartCar");
             }
         }
 
+        private class ExitListener implements  ActionListener {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+            }
+        }
     }
+
 
 }

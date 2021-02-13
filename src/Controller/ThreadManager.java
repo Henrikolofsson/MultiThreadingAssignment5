@@ -2,25 +2,21 @@ package Controller;
 
 import Entities.Car;
 import Enums.CarStatus;
-import GUI.CarLoggerPanel;
-import javafx.concurrent.Task;
-
 import java.util.LinkedList;
-import java.util.Queue;
 import java.util.concurrent.*;
 
 public class ThreadManager extends Thread {
     private Controller controller;
-    private ThreadPoolExecutor executor;
-    private Task task;
+    private ScheduledThreadPoolExecutor executor;
     private Thread thread;
     private LinkedList<Car> carQueue;
 
-    private ScheduledThreadPoolExecutor scheduledExecutor;
+
+    private ScheduledExecutorService scheduledExecutor;
 
     public ThreadManager(Controller controller) {
         this.controller = controller;
-        executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
+        scheduledExecutor =  Executors.newScheduledThreadPool(10);
         carQueue = new LinkedList<>();
 
     }
@@ -32,16 +28,27 @@ public class ThreadManager extends Thread {
     @Override
     public void run() {
         super.run();
+        //Run the thread
         while(true) {
 
-            while(carQueue.size() > 0) {
-                for(int i = 0; i < carQueue.size(); i++) {
-                    startCar(carQueue.get(i));
-                }
-            }
+            //While a car is added to active car list, do a task for each car
+           while(controller.getCars().size() > 0) {
+               for(int i = 0; i < controller.getCars().size(); i++) {
+                   System.out.println(controller.getCars().get(i));
+                   CarTask task = new CarTask(controller.getCars().get(i));
+                   ScheduledFuture<Integer> future = scheduledExecutor.schedule(task, 5, TimeUnit.SECONDS);
+
+
+                   try {
+                       System.out.println(future.get());
+                   } catch (InterruptedException | ExecutionException e) {
+                       e.printStackTrace();
+                   }
+               }
+       }
 
             try {
-                sleep(20);
+                sleep(500);
             } catch(InterruptedException e) {
                 e.printStackTrace();
             }

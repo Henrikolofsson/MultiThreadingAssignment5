@@ -8,6 +8,8 @@ import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Vector;
 
 public class CarLoggerPanel extends JPanel {
@@ -22,10 +24,16 @@ public class CarLoggerPanel extends JPanel {
     private int rowSize;
     private int columnSize;
 
+    private JButton btnStart;
+    private JButton btnPause;
+    private JButton btnChangeSpeed;
+    private JButton btnExitRace;
+
     public CarLoggerPanel(Controller controller) {
         this.controller = controller;
         initializeComponents();
         initializeGUI();
+        registerListeners();
     }
 
     private void initializeComponents() {
@@ -43,6 +51,11 @@ public class CarLoggerPanel extends JPanel {
         table = new JTable(model);
         table.setBounds(0, 200, 225, 350);
         scrollPane.setViewportView(table);
+
+        btnStart = new JButton("Start");
+        btnPause = new JButton("Pause");
+        btnChangeSpeed = new JButton("Change Speed");
+        btnExitRace = new JButton("Exit Race");
     }
 
     private void initializeGUI() {
@@ -59,8 +72,31 @@ public class CarLoggerPanel extends JPanel {
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 0;
+        c.gridwidth = 4;
         c.insets = new Insets(20, 20, 10, 20);
         add(scrollPane, c);
+
+        c.gridy = 1;
+        c.gridx = 0;
+        c.gridwidth = 1;
+        c.insets = new Insets(20, 20, 10, 20);
+        add(btnStart, c);
+
+        c.gridy = 1;
+        c.gridx = 1;
+        add(btnPause, c);
+
+        c.gridy = 1;
+        c.gridx = 2;
+        add(btnChangeSpeed, c);
+
+        c.gridy = 1;
+        c.gridx = 3;
+        add(btnExitRace, c);
+    }
+
+    private void registerListeners() {
+        btnStart.addActionListener(new StartListener());
     }
 
     public synchronized void logInfo(Car car) {
@@ -91,5 +127,17 @@ public class CarLoggerPanel extends JPanel {
             }
         }
         tempData = null;
+    }
+
+    public String getSelectedCar() {
+        return table.getValueAt(table.getSelectedRow(), 0).toString();
+    }
+
+    private class StartListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            controller.btnPressed("StartCar");
+        }
     }
 }

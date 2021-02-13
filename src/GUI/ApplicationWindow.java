@@ -50,4 +50,15 @@ public class ApplicationWindow extends JFrame {
         carLoggerPanel.logInfo(car);
     }
 
+    public Car getCar() {
+        return carDetailsPanel.getCar();
+    }
+
+    public void updateCars(String[] carModels) {
+        carDetailsPanel.setCars(carModels);
+    }
+
+    public String getChosenCar() {
+        return carLoggerPanel.getSelectedCar();
+    }
 }

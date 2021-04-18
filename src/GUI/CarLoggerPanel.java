@@ -97,6 +97,7 @@ public class CarLoggerPanel extends JPanel {
 
     private void registerListeners() {
         btnStart.addActionListener(new StartListener());
+        btnExitRace.addActionListener(new ExitRace());
     }
 
     public synchronized void logInfo(Car car) {
@@ -105,7 +106,7 @@ public class CarLoggerPanel extends JPanel {
             expandArray();
         }
         data[numberOfLines][0] = car.getID();
-        data[numberOfLines][1] = String.valueOf(car.getSpeed());
+        data[numberOfLines][1] = String.valueOf(car.getDistanceTraveled());
         data[numberOfLines][2] = String.valueOf(car.getCarStatus());
         numberOfLines++;
         model = new DefaultTableModel(data, columnNames);
@@ -137,7 +138,14 @@ public class CarLoggerPanel extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            controller.btnPressed("StartCar");
+            controller.btnPressed("OpenCarWindow");
+        }
+    }
+
+    private class ExitRace implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            controller.btnPressed("ExitRace");
         }
     }
 }

@@ -48,6 +48,11 @@ public class CarWindow extends JFrame {
        // pack();
     }
 
+    public int getSpeed() {
+        return carPanel.getSpeed();
+    }
+
+
 
     public void closeWindow() {
         dispose();
@@ -61,7 +66,6 @@ public class CarWindow extends JFrame {
         private JSlider slider;
         private JPanel panelSouth;
         private JButton btnStart;
-        private JButton btnPause;
         private JButton btnExitRace;
         private JButton btnCloseWindow;
 
@@ -95,7 +99,6 @@ public class CarWindow extends JFrame {
 
             panelSouth = new JPanel(new GridBagLayout());
             btnStart = new JButton("Start");
-            btnPause = new JButton("Pause");
             btnExitRace = new JButton("Exit Race");
             btnCloseWindow = new JButton("Exit");
         }
@@ -112,12 +115,9 @@ public class CarWindow extends JFrame {
             panelSouth.add(btnStart, c);
 
             c.gridx = 1;
-            panelSouth.add(btnPause, c);
-
-            c.gridx = 2;
             panelSouth.add(btnExitRace, c);
 
-            c.gridx = 3;
+            c.gridx = 2;
             panelSouth.add(btnCloseWindow, c);
 
             add(panelSouth, BorderLayout.SOUTH);
@@ -128,6 +128,10 @@ public class CarWindow extends JFrame {
             return car;
         }
 
+
+        public int getSpeed() {
+            return slider.getValue();
+        }
 
         private void registerListeners() {
             btnStart.addActionListener(new StartListener());

@@ -1,8 +1,11 @@
 package Controller;
 
 import Entities.Car;
+import Enums.CarStatus;
 import GUI.ApplicationWindow;
 import GUI.CarWindow;
+import Threads.TestThreadManager;
+import Threads.ThreadManager;
 
 import java.util.LinkedList;
 
@@ -15,14 +18,18 @@ public class Controller implements LogCallback {
     private String[] tankVolume;
     private LinkedList<Car> cars;
 
+    private TestThreadManager testThreadManager;
+
     public Controller(ApplicationWindow applicationWindow) {
         initializeCars();
         initializeFuel();
         initializeTankVolume();
         this.applicationWindow = applicationWindow;
         cars = new LinkedList<>();
-        threadManager = new ThreadManager(this);
-        threadManager.start();
+        //threadManager = new ThreadManager(this);
+        //threadManager.start();
+
+        testThreadManager = new TestThreadManager(this);
 
     }
 
@@ -83,14 +90,29 @@ public class Controller implements LogCallback {
     }
 
     public void btnPressed(String button) {
+        Car car;
+
         switch(button) {
-            case "AddCar":  cars.add(applicationWindow.getCar());
+            case "AddCar":  car = applicationWindow.getCar();
+                            cars.add(car);
                             removeCar(applicationWindow.getCar().getID());
                             applicationWindow.logInfo(applicationWindow.getCar());
                             applicationWindow.updateCars(carModels);
+                            testThreadManager.addTask(car);
                 break;
 
-            case "StartCar":    carWindow = new CarWindow(this, getCar(applicationWindow.getChosenCar()));
+            case "OpenCarWindow":    carWindow = new CarWindow(this, getCar(applicationWindow.getChosenCar()));
+                break;
+
+            case "StartCar":    car = getCar(applicationWindow.getChosenCar());
+                                assert car != null;
+                                car.setCarStatus(CarStatus.RUNNING);
+                                car.setSpeed(carWindow.getSpeed());
+                break;
+
+            case "ExitRace":    Car car2 = getCar(applicationWindow.getChosenCar());
+                                assert car2 != null;
+                                car2.setCarStatus(CarStatus.LEAVING);
                 break;
         }
     }
@@ -108,26 +130,13 @@ public class Controller implements LogCallback {
         return null;
     }
 
-
-    public void startCar(Car car, int speed) {
-        threadManager.startCar(car);
-    }
-
-    public void stopCar(Car car) {
-        threadManager.pauseCar(car);
-    }
-
-    public void exitRace(Car car) {
-        threadManager.removeCar(car);
-    }
-
-    public void addCarToQueue(Car car) {
-        threadManager.addCarToQueue(car);
-    }
-
     @Override
     public synchronized void updateLog(Car car) {
         applicationWindow.logInfo(car);
+    }
+
+    public void removeCarFromCarPool(Car car) {
+        cars.remove(car);
     }
 
     private void removeCar(String carName) {

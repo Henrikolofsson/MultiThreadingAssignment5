@@ -1,5 +1,6 @@
-package Controller;
+package Threads;
 
+import Controller.Controller;
 import Entities.Car;
 import Enums.CarStatus;
 import java.util.LinkedList;
@@ -34,18 +35,24 @@ public class ThreadManager extends Thread {
             //While a car is added to active car list, do a task for each car
            while(controller.getCars().size() > 0) {
                for(int i = 0; i < controller.getCars().size(); i++) {
-                   System.out.println(controller.getCars().get(i));
-                   CarTask task = new CarTask(controller.getCars().get(i));
-                   ScheduledFuture<Integer> future = scheduledExecutor.schedule(task, 5, TimeUnit.SECONDS);
+                   //System.out.println(controller.getCars().get(i));
+                   //CarTask task = new CarTask(controller.getCars().get(i));
+                   //ScheduledFuture<Integer> future = scheduledExecutor.schedule(task, 5, TimeUnit.SECONDS);
 
-
-                   try {
+                   /*try {
                        System.out.println(future.get());
                    } catch (InterruptedException | ExecutionException e) {
                        e.printStackTrace();
-                   }
+                   }*/
+
+                   //CarThread carThread = new CarThread(controller, controller.getCars().get(i));
+                   TestThread testThread = new TestThread();
+                   scheduledExecutor.scheduleAtFixedRate(testThread, 0, 5, TimeUnit.SECONDS);
+
+
+
                }
-       }
+           }
 
             try {
                 sleep(500);
@@ -72,14 +79,6 @@ public class ThreadManager extends Thread {
 
     }
 
-    public void pauseCar(Car car) {
-
-    }
-
-    public void removeCar(Car car) {
-
-    }
-
     private class CarTask implements Callable<Integer> {
         private Car car;
 
@@ -94,7 +93,6 @@ public class ThreadManager extends Thread {
                 case NOT_STARTED:
                     System.out.println("NOT_STARTED");
                     controller.updateLog(car);
-
                     break;
 
                 case RUNNING:
@@ -105,30 +103,40 @@ public class ThreadManager extends Thread {
                     car.setCurrentTankVolume(car.getCurrentTankVolume() - fuelConsumed);
                     if(car.getCurrentTankVolume() <= 0) {
                         car.setCurrentTankVolume(0);
+                        car.setSpeed(0);
                         car.setCarStatus(CarStatus.OUT_OF_GAS);
                     }
-
+                    controller.updateLog(car);
                     break;
 
                 case PAUSED:
                     System.out.println("PAUSED");
+                    car.setCarStatus(CarStatus.PAUSED);
                     break;
 
                 case OUT_OF_GAS:
                     System.out.println("OUT_OF_GAS");
+                    controller.updateLog(car);
                     break;
 
                 case LEAVING:
                     System.out.println("LEAVING");
+                    controller.updateLog(car);
+                    controller.removeCarFromCarPool(car);
                     break;
 
                 case RESTARTED:
                     System.out.println("RESTARTED");
+                    car.setDistanceTraveled(0);
+                    car.setCurrentTankVolume(car.getFuelTankMAX());
+                    car.setCarStatus(CarStatus.RESTARTED);
+                    controller.updateLog(car);
+                    car.setCarStatus(CarStatus.RUNNING);
                     break;
             }
 
             try {
-                System.out.println(car);
+                //System.out.println(car);
                 TimeUnit.SECONDS.sleep(5);
             } catch(InterruptedException e) {
                 e.printStackTrace();

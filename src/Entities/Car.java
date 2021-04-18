@@ -13,9 +13,9 @@ public class Car {
 
     public Car(String ID, double fuelConsumption, double fuelTankVolume) {
         this.ID = ID;
-        this. fuelConsumption = fuelConsumption;
+        this.fuelConsumption = fuelConsumption;
         this.fuelTankMAX = fuelTankVolume;
-        CarStatus = CarStatus.NOT_STARTED;
+        CarStatus = Enums.CarStatus.NOT_STARTED;
         currentTankVolume = fuelTankMAX;
     }
 
@@ -56,6 +56,7 @@ public class Car {
     }
 
     public void setDistanceTraveled(double distanceTraveled) {
+        System.out.println("Distance traveled:" + distanceTraveled);
         this.distanceTraveled = distanceTraveled;
     }
 
